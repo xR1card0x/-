@@ -97,7 +97,7 @@ function missingFields(a){
 
 /* ---------------- 筛选与排序 ---------------- */
 const state = {
-  q:"", cat:"all", status:"all", audience:"all", fresh:"all", source:"all",
+  q:"", cat:"any", status:"any", audience:"any", fresh:"any", source:"any",
   sort:"smart", quick:"", view:"discover"
 };
 
@@ -108,12 +108,12 @@ function filteredActivities(){
     a._st = computeStatus(a, now);
     if (freshMode && a.freshman !== "good") return false;
     if (freshMode && a.source === "risk") return false;
-    if (state.cat !== "all" && a.category !== state.cat) return false;
-    if (state.source !== "all" && a.source !== state.source) return false;
-    if (state.fresh !== "all" && a.freshman !== state.fresh) return false;
-    if (state.audience !== "all" &&
+    if (state.cat !== "any" && a.category !== state.cat) return false;
+    if (state.source !== "any" && a.source !== state.source) return false;
+    if (state.fresh !== "any" && a.freshman !== state.fresh) return false;
+    if (state.audience !== "any" &&
         a.audiences && a.audiences.length && !a.audiences.includes(state.audience)) return false;
-    if (state.status !== "all"){
+    if (state.status !== "any"){
       if (state.status === "full"){ if (!a.partialFull) return false; }
       else if (a._st !== state.status) return false;
     }
@@ -244,11 +244,11 @@ function renderCards(){
     </div>`;
   const total = allActivities().length;
   const conds = [];
-  if (state.cat!=="all") conds.push("类型:"+META.categories[state.cat].label);
-  if (state.status!=="all") conds.push("状态:"+(state.status==="full"?"已满":META.statuses[state.status].label));
-  if (state.audience!=="all") conds.push("对象:"+META.audiences[state.audience].label);
-  if (state.fresh!=="all") conds.push(META.freshman[state.fresh].label);
-  if (state.source!=="all") conds.push("来源:"+META.sources[state.source].label);
+  if (state.cat!=="any") conds.push("类型:"+META.categories[state.cat].label);
+  if (state.status!=="any") conds.push("状态:"+(state.status==="full"?"已满":META.statuses[state.status].label));
+  if (state.audience!=="any") conds.push("对象:"+META.audiences[state.audience].label);
+  if (state.fresh!=="any") conds.push(META.freshman[state.fresh].label);
+  if (state.source!=="any") conds.push("来源:"+META.sources[state.source].label);
   if (state.quick==="today") conds.push("今日活动");
   if (state.q) conds.push('关键词"'+state.q+'"');
   $("#resultsMeta").innerHTML =
@@ -261,7 +261,7 @@ function renderCards(){
 /* ---------------- 筛选面板 ---------------- */
 function chipRow(label, key, items){
   const cur = state[key];
-  const chips = [`<button class="chip ${cur==="all"?"active":""}" data-k="${key}" data-v="all">全部</button>`]
+  const chips = [`<button class="chip ${cur==="any"?"active":""}" data-k="${key}" data-v="any">全部</button>`]
     .concat(items.map(([v, txt, color]) =>
       `<button class="chip ${cur===v?"active":""}" data-k="${key}" data-v="${v}">
         ${color?`<span class="dot" style="background:${color}"></span>`:""}${txt}</button>`));
@@ -759,10 +759,10 @@ function bindEvents(){
     if (q === "today"){
       state.quick = state.quick === "today" ? "" : "today";
     } else if (q === "closing" || q === "updated"){
-      state.status = state.status === q ? "all" : q;
+      state.status = state.status === q ? "any" : q;
       state.quick = "";
     } else if (q === "risk"){
-      if (state.source === "risk"){ state.source = "all"; }
+      if (state.source === "risk"){ state.source = "any"; }
       else {
         state.source = "risk";
         if (freshMode){ setFreshMode(false); toast("已暂时关闭新生模式以查看风险信息（仅用于学习甄别）", 3500); }
